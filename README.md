@@ -1,2 +1,2 @@
-# qa-potfolio
+# qa-portfolio
 A portfolio: Playwright UI, API, SQL, CI and AI/LLM evaluation
