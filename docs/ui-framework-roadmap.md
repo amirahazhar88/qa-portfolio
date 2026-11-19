@@ -2,7 +2,7 @@
 
 A reference for how the Playwright framework in `ui-tests/` is built, step by step. Each step builds on the one before it.
 
-**Stack:** Playwright + TypeScript, testing **newsclip** (`app-under-test/`).
+**Stack:** Playwright + TypeScript, testing **newsclip** (`newsclip/`).
 **Related:** [test-plan.md](test-plan.md) says *what* to test. This guide says *how the framework is built*.
 
 ## Status
@@ -26,7 +26,7 @@ A reference for how the Playwright framework in `ui-tests/` is built, step by st
 
 **What we did**
 - Run the API (Node + MySQL) with Docker Compose on `:3100` and the Vue frontend on `:8080`.
-- Point the frontend at the local API with `VITE_API_URL` in `app-under-test/web/.env.local`.
+- Point the frontend at the local API with `VITE_API_URL` in `newsclip/web/.env.local`.
 - Document the start-up steps in the README.
 
 **Why:** A shared public API can be down, slow, or full of other people's data. Flaky target means flaky tests, and you can't tell a bug from bad luck.
@@ -183,8 +183,8 @@ Habits to keep while building the framework.
 
 ```sh
 # start the app
-cd app-under-test/api && docker compose up -d
-cd app-under-test/web && npm run serve
+cd newsclip/api && docker compose up -d
+cd newsclip/web && npm run serve
 
 # run the tests
 cd ui-tests

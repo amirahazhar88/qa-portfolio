@@ -22,7 +22,7 @@ This repository has been approved and included on the <a href="https://codebase.
 <p align="center"> This repository has complete functionality — pull requests and issues are welcome! </p>
 
 <p align="center">
-<a href="#demo">Demo</a>
+<a href="#credits">Credits</a>
 <span>|</span>
 <a href="#get_started">Get Started</a>
 <span>|</span>
@@ -31,13 +31,9 @@ This repository has been approved and included on the <a href="https://codebase.
 <a href="#contributing">Contributing</a>
 </p>
 
-## Demo
+## Credits
 
-To demonstrate the functionality of the backend, we have deployed a live demo version of the application. You can visit the demo by following this link: [https://conduit-api-prod.kenyip.cc](https://conduit-api-prod.kenyip.cc).
-
-The API has several endpoints that you can test out using a tool like Postman or cURL. You can find the documentation for the API endpoints on the [API documentation page](https://conduit-api-develop.kenyip.cc). Feel free to use this endpoint to create your amazing frontend applications!
-
-Please note that the demo version of the application is intended for demonstration purposes only and may not be suitable for production use. If you would like to deploy the application yourself, please follow the instructions in the <a href="#get_started">Get Started</a> section of this README.
+This API is adapted from the MIT-licensed [RealWorld](https://github.com/gothinkster/realworld) backend by Ken Yip, and is used here as the application under test for the qa-portfolio project. It has no public demo. To run it yourself, follow the <a href="#get_started">Get Started</a> section of this README.
 
 <a id="get_started"></a>
 

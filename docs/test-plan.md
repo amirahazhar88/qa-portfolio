@@ -5,7 +5,7 @@
 | **Status** | Draft v0.1 |
 | **Author** | Amirah Azhar |
 | **Date** | 2026-11-03 |
-| **Application** | newsclip (RealWorld/Conduit clone), `app-under-test/` |
+| **Application** | newsclip (RealWorld/Conduit clone), `newsclip/` |
 
 ## 1. Purpose
 
@@ -17,8 +17,8 @@ Define what will be tested in newsclip, how, with what tools, and when testing i
 Vue 3 SPA (Vite, :8080)  ──fetch + Bearer JWT──►  Express API (:3100/api)  ──►  MySQL 8 (knex)
 ```
 
-- **Frontend:** Vue 3, Pinia, vue-router (`app-under-test/web`)
-- **API:** Node/Express in TypeScript, split into `article`, `user` and `app` services (`app-under-test/api`)
+- **Frontend:** Vue 3, Pinia, vue-router (`newsclip/web`)
+- **API:** Node/Express in TypeScript, split into `article`, `user` and `app` services (`newsclip/api`)
 - **Run locally:** Docker Compose for API and DB; `npm run serve` for the frontend (see README)
 
 ## 3. Scope
@@ -42,6 +42,7 @@ Vue 3 SPA (Vite, :8080)  ──fetch + Bearer JWT──►  Express API (:3100/a
 - Deployment/Lambda packaging and cloud infrastructure
 - Third-party code internals (Vue, Express, MySQL)
 - Internationalisation (app is English only)
+- **Dropped on 2026-11-19 to keep the portfolio focused:** AI/LLM evaluation (`ai-tests/`), non-functional testing beyond the XSS check in F17 (JWT expiry/tampering, accessibility, mobile viewport), and session-based exploratory testing.
 
 ## 4. Test approach
 
@@ -52,9 +53,6 @@ Tests follow a pyramid: most coverage at the API level, fewer UI end-to-end test
 | API | pytest + requests; Postman/Newman | `api-tests/` | Every endpoint: happy path, validation (422), auth (401/403), not found (404), conflicts (409). Authorization between users. Pagination and filters. |
 | UI E2E | Playwright (Chromium only for now) | `ui-tests/` | Critical user journeys. Page Object Model. State set up through the API where possible. |
 | Data | SQL | `sql/` | Orphaned rows, duplicate slug/email/username, favorite counts vs. favorites table, cascade deletes. |
-| Non-functional | Manual + Playwright | `ui-tests/`, `docs/` | XSS via markdown/comments, JWT expiry/tampering, basic accessibility, one mobile viewport. |
-| AI/LLM eval | Rubric + runner | `ai-tests/` | Evaluate LLM-generated test cases or bug reports against a scoring rubric (optional). |
-| Exploratory | Manual, session-based | `docs/` | Charters per feature area, findings logged as bug reports. |
 
 ### Test design techniques
 
@@ -87,7 +85,7 @@ Equivalence partitioning and boundary values (field lengths, page limits), state
 | Database | MySQL 8.0 in Docker (`conduit-local`), migrated with knex |
 | Browsers | Chromium (Playwright latest). Firefox and WebKit are configured out to keep CI fast; they can be re-added as extra `projects` in `playwright.config.ts`. |
 | CI | GitHub Actions (ubuntu-latest) |
-| Config | `.env` from `.env.example` (`BASE_URL`, `API_URL`, `API_TOKEN`, `LLM_API_KEY`) |
+| Config | `.env` from `.env.example` (`BASE_URL`, `API_URL`, `API_TOKEN`) |
 
 ## 7. Entry and exit criteria
 
@@ -109,25 +107,25 @@ Status: ✅ done, 🟡 partial, ⬜ not started. Priority: P1 critical, P2 impor
 
 | # | Feature | Priority | API | UI | SQL | Status |
 |---|---|---|---|---|---|---|
-| F1 | Register | P1 | ⬜ | ✅ happy path | ⬜ | 🟡 |
-| F2 | Login (valid/invalid) | P1 | 🟡 (Postman) | ✅ | ⬜ | 🟡 |
+| F1 | Register | P1 | 🟡 conflicts, validation; invalid email accepted ([BUG-005](bugs/BUG-005.md)) | ✅ happy path | ⬜ | 🟡 |
+| F2 | Login (valid/invalid) | P1 | ✅ | ✅ | ⬜ | 🟡 |
 | F3 | Logout / session persistence | P1 | n/a | ✅ | n/a | ✅ |
-| F4 | Route guards (`/settings`, `/editor`, following feed) | P1 | 🟡 | ✅ | n/a | 🟡 |
-| F5 | Update user settings | P2 | 🟡 | 🟡 bio, password, duplicate email; empty-field save blocked by [BUG-002](bugs/BUG-002.md) | ⬜ | 🟡 |
-| F6 | Create article | P1 | 🟡 | ✅ happy path + missing title | ⬜ | 🟡 |
-| F7 | Edit article (author only) | P1 | 🟡 | ✅ edit; non-author sees no controls | ⬜ | 🟡 |
-| F8 | Delete article (author only) | P1 | 🟡 | ✅ delete; non-author sees no controls | ⬜ | 🟡 |
-| F9 | Global feed + pagination | P1 | 🟡 | 🟡 page 1 ✅, page 2 blocked by [BUG-001](bugs/BUG-001.md) | n/a | 🟡 |
-| F10 | Filter by tag / author / favorited | P2 | 🟡 | ✅ tag, author (profile) and favorited (profile) | n/a | ✅ |
-| F11 | Following feed | P2 | 🟡 | ✅ empty state + followed author's article | ⬜ | ✅ |
-| F12 | Favorite / unfavorite | P2 | 🟡 | ✅ toggle, persistence, profile list, signed-out redirect | ⬜ | ✅ |
-| F13 | Follow / unfollow | P2 | 🟡 | 🟡 profile page ✅; article page blocked by [BUG-003](bugs/BUG-003.md) | ⬜ | 🟡 |
-| F14 | Comments (add/list/delete) | P2 | 🟡 | ✅ add, empty rejected, delete own, others read-only, signed-out prompt | ⬜ | ✅ |
-| F15 | Tags list | P3 | 🟡 | ⬜ | n/a | ⬜ |
-| F16 | Profile pages | P3 | 🟡 | 🟡 author articles, favorites, follow button, bio | n/a | 🟡 |
+| F4 | Route guards (`/settings`, `/editor`, following feed) | P1 | ✅ every write endpoint returns 401 without a token | ✅ | n/a | 🟡 |
+| F5 | Update user settings | P2 | 🟡 [BUG-002](bugs/BUG-002.md), [BUG-004](bugs/BUG-004.md) | 🟡 bio, password, duplicate email; empty-field save blocked by [BUG-002](bugs/BUG-002.md) | ⬜ | 🟡 |
+| F6 | Create article | P1 | ✅ | ✅ happy path + missing title | ⬜ | 🟡 |
+| F7 | Edit article (author only) | P1 | ✅ incl. 403 for other users | ✅ edit; non-author sees no controls | ⬜ | 🟡 |
+| F8 | Delete article (author only) | P1 | ✅ incl. 403 for other users | ✅ delete; non-author sees no controls | ⬜ | 🟡 |
+| F9 | Global feed + pagination | P1 | 🟡 limit/filters ✅; offset blocked by [BUG-001](bugs/BUG-001.md), negative limit [BUG-006](bugs/BUG-006.md) | 🟡 page 1 ✅, page 2 blocked by [BUG-001](bugs/BUG-001.md) | n/a | 🟡 |
+| F10 | Filter by tag / author / favorited | P2 | ✅ | ✅ tag, author (profile) and favorited (profile) | n/a | ✅ |
+| F11 | Following feed | P2 | ✅ | ✅ empty state + followed author's article | ⬜ | ✅ |
+| F12 | Favorite / unfavorite | P2 | 🟡 [BUG-008](bugs/BUG-008.md) (`favorited` wrong for other readers) | ✅ toggle, persistence, profile list, signed-out redirect | ⬜ | ✅ |
+| F13 | Follow / unfollow | P2 | 🟡 [BUG-009](bugs/BUG-009.md) (`following` wrong for anonymous) | 🟡 profile page ✅; article page blocked by [BUG-003](bugs/BUG-003.md) | ⬜ | 🟡 |
+| F14 | Comments (add/list/delete) | P2 | 🟡 delete does not remove the comment ([BUG-007](bugs/BUG-007.md)) | ✅ add, empty rejected, delete own, others read-only, signed-out prompt | ⬜ | ✅ |
+| F15 | Tags list | P3 | ✅ | ⬜ | n/a | 🟡 |
+| F16 | Profile pages | P3 | ✅ | 🟡 author articles, favorites, follow button, bio | n/a | 🟡 |
 | F17 | Markdown rendering / XSS sanitisation | P1 | n/a | 🟡 article body only (not titles/comments) | n/a | 🟡 |
 
-"🟡 (Postman)" refers to the upstream collection in `app-under-test/api/tests/integration/`; it will be reviewed and replaced or extended by tests in `api-tests/`.
+The API column is covered by `api-tests/` (pytest). Known defects are encoded as strict `xfail` tests that point at a file in `docs/bugs/`.
 
 ## 9. Deliverables
 
@@ -139,9 +137,9 @@ Status: ✅ done, 🟡 partial, ⬜ not started. Priority: P1 critical, P2 impor
 | Playwright suite | `ui-tests/` |
 | API tests | `api-tests/` |
 | SQL checks | `sql/` |
-| AI eval set and runner | `ai-tests/` |
 | CI pipeline | `.github/workflows/` |
 | Test summary report | `docs/test-summary.md` |
+| Allure report (API + UI) | `scripts/report.sh`, CI artifact `allure-report`, GitHub Pages |
 
 ## 10. Schedule (proposed)
 
@@ -150,8 +148,8 @@ Status: ✅ done, 🟡 partial, ⬜ not started. Priority: P1 critical, P2 impor
 | 1 | Test plan and test cases drafted; CI moved to root and running against a started stack |
 | 2 | API test suite (auth, articles, authorization) |
 | 3 | UI E2E for critical journeys; SQL integrity checks |
-| 4 | Non-functional checks, exploratory sessions, bug reports |
-| 5 | AI eval, test summary, final cleanup |
+| 4 | SQL checks, Allure reporting, test cases document |
+| 5 | Test summary, README, final cleanup |
 
 ## 11. Defect management
 
@@ -160,12 +158,12 @@ Status: ✅ done, 🟡 partial, ⬜ not started. Priority: P1 critical, P2 impor
 
 ## 12. Current gaps to resolve
 
-- The CI workflow sits in `ui-tests/.github/workflows/`, which GitHub ignores. It needs to move to the repo root and start the API and frontend before running tests.
-- `api-tests/`, `sql/`, `ai-tests/` and `docs/` (other than this file) are still empty.
-- Test data cleanup is not yet implemented.
+- Allure publishing to GitHub Pages needs the repo setting *Pages > Source: GitHub Actions*, and the new CI steps have not run on GitHub yet.
+- Fix-or-defer decisions for the open bugs are not recorded yet.
+- P3 UI coverage (tags list, profile polish) is on hold.
+- Test users are not cleaned up (articles are); reset the local database with `docker compose down -v`.
+- Postman/Newman is not used; pytest covers the API.
 
 ## 13. Open questions
 
 - Should the upstream Postman collection be kept as a regression baseline or replaced?
-- Is the AI/LLM evaluation in scope for the final portfolio, and against what subject (generated test cases, bug reports)?
-- Which accessibility standard and tool (e.g. axe-core, WCAG 2.1 AA) should be the target?
